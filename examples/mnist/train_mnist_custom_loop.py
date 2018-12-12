@@ -100,7 +100,11 @@ def main():
         while train_iter.epoch < args.epoch:
             batch = train_iter.next()
             x, t = convert.concat_examples(batch, device)
-            optimizer.update(model, x, t)
+            loss = model(x, t)  # type: chainer.Variable
+            model.cleargrads()
+            loss.backward()
+            optimizer.update()
+            del loss
             sum_loss += float(model.loss.array) * len(t)
             sum_accuracy += float(model.accuracy.array) * len(t)
 
